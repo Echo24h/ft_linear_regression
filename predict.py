@@ -1,16 +1,39 @@
+import pandas as pd
 
-def loadParameters(filename):
-    with open(filename, 'r') as file:
-        theta0, theta1 = map(float, file.readline().strip().split(','))
-    return theta0, theta1
 
-# Fonction pour prédire le prix en utilisant les paramètres theta0 et theta1
-def estimatePrice(mileage):
-    theta0, theta1 = loadParameters("parameters.txt")
-    return theta0 + (theta1 * mileage)
+def loadParameters() -> tuple:
+    """ 
+    Load the parameters from the file theta.csv
+    
+    Returns:
+        float: The value of theta0
+        float: The value of theta1
+    """
+    df = pd.read_csv('theta.csv')
+    if df is None or df.empty:
+        print("Error: No parameters found")
+        return 0, 0
+    return df['theta0'][0], df['theta1'][0]
+
+
+def estimatePrice(km: float) -> float:
+    """
+    Estimate the price of a car given its km
+    
+    Args:
+        km (float): The km of the car
+        
+    Returns:
+        float: The estimated price of the car
+    """
+    t0, t1 = loadParameters()
+    return t0 + (t1 * km)
+
+
+def main():
+    km = float(input("Entrez les miles de la voiture : "))
+    print(f"Le prix estimé de la voiture pour un kilométrage de {km} miles est : {estimatePrice(km):.2f} euros.")
 
 
 if __name__ == "__main__":
-    mileage = float(input("Entrez le kilométrage de la voiture : "))
-    estimated_price = estimatePrice(mileage)
-    print("Le prix estimé de la voiture pour un kilométrage de {} km est : {:.2f} euros.".format(mileage, estimated_price))
+    main()

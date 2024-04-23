@@ -1,46 +1,91 @@
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# Fonction pour lire les données à partir du fichier CSV
-def readData(filename):
-    with open(filename, 'r') as file:
-        next(file)  # Ignorer l'en-tête
-        data = [list(map(int, line.strip().split(','))) for line in file]
-    return data
+def saveParameters(t0, t1):
+    pd.DataFrame({'theta0': [t0], 'theta1': [t1]}).to_csv('theta.csv', index=False)
 
-def saveParameters(theta0, theta1):
-    with open("parameters.txt", 'w') as file:
-        file.write("{},{}".format(0, 0))
 
-def estimatePrice(mileage, theta0, theta1):
-    return theta0 + (theta1 * mileage)
+def trainModelWithLearningRate(km, price, t0, t1, learning_rate, epochs):
+
+    n = len(km)
+
+    km_mean = np.mean(km)
+
+    km_norm = (km / km_mean)# / np.std(km)
+    
+
+    for _ in range(epochs):
+        prediction = t0 + (t1 * km)
+        t0 -= learning_rate / n * sum(prediction - price)
+        t1 -= learning_rate / n * sum((prediction - price) * km_norm)
+
+    t1 = t1 / km_mean
+
+    return t0, t1
+
 
 # Fonction pour entraîner le modèle et sauvegarder les paramètres
-def trainModel(data, learning_rate):
-    
-    saveParameters(0, 0)
-    theta0, theta1 = 0, 0
-    
-    m = len(data)
+def trainModel(km, price):
 
-    for _ in range(1000):
-        tmp_theta0, tmp_theta1 = 0, 0
-        for mileage, price in data:
-            tmp_theta0 += (estimatePrice(mileage, theta0, theta1) - price)
-            tmp_theta1 += (estimatePrice(mileage, theta0, theta1) - price) * mileage
+    learning_rates = {1, 0.1, 0.01} # Taux d'apprentissage
+    epochs = 100 # Nombre d'itérations
+
+    t0, t1 = 0, 0
+
+    for lr in learning_rates:
+            
+            t0, t1 = trainModelWithLearningRate(km, price, t0, t1, lr, epochs)
+            print(f"Learning rate: {lr}")
+            print(f"θ₀: {t0}")
+            print(f"θ₁: {t1}")
+            print("Price = θ₀ + θ₁ * km")
+            print("")
+
+            saveParameters(t0, t1)
+
+    # for _ in range(epochs):
+    #    prediction = t0 + (t1 * km_norm)
+    #    error[_] = sum((prediction - price) ** 2) / (2 * n)
+    #    t0 -= learning_rate / n * sum(prediction - price)
+    #    t1 -= learning_rate / n * sum((prediction - price) * km_norm)
         
-        theta0 -= learning_rate * 1/m * tmp_theta0
-        theta1 -= learning_rate * 1/m * tmp_theta1
+    # plt.plot(list(error.keys()), list(error.values()))
+    # plt.title('Error')
+    # plt.show()
 
-        print("theta0: {}, theta1: {}".format(theta0, theta1))
+    #t1 = t1 / np.std(km)
+    
+
+    return t0, t1
 
 
-    with open("parameters.txt", 'w') as file:
-        file.write("{},{}".format(theta0, theta1))
+def main():
+    dataFrame = pd.read_csv('data.csv')
+
+    
+
+    km = dataFrame['km'].values
+    price = dataFrame['price'].values
+
+    t0, t1 = trainModel(km, price)
+
+    print(f"θ₀: {t0}")
+    print(f"θ₁: {t1}")
+    print("Price = θ₀ + θ₁ * km")
+
+    plt.scatter(km, price)
+
+    plt.labelx = 'km'
+    plt.labely = 'price'
+
+    plt.title('Price = θ₀ + θ₁ * km')
+    plt.legend(['Data', ''])
+
+    plt.plot(km, t0 + (t1 * km), color='red')
+    plt.show()
+
 
 
 if __name__ == "__main__":
-    data = readData("data.csv")
-    learning_rate = 0.1 # Taux d'apprentissage
-    
-    trainModel(data, learning_rate)
-    
+    main()
