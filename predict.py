@@ -4,7 +4,7 @@ import pandas as pd
 def loadParameters() -> tuple:
     """ 
     Load the parameters from the file theta.csv
-    
+
     Returns:
         float: The value of theta0
         float: The value of theta1
@@ -14,6 +14,21 @@ def loadParameters() -> tuple:
         print("Error: No parameters found")
         return 0, 0
     return df['theta0'][0], df['theta1'][0]
+
+def loadParameters() -> tuple:
+    """ 
+    Load the parameters from the file theta.csv
+
+    Returns:
+        float: The value of theta0
+        float: The value of theta1
+    """
+    try:
+        df = pd.read_csv('theta.csv')
+        return df['theta0'][0], df['theta1'][0]
+    except Exception as e:
+        print(f"Error: {e}")
+        return 0, 0
 
 
 def estimatePrice(km: float) -> float:
@@ -30,10 +45,6 @@ def estimatePrice(km: float) -> float:
     return t0 + (t1 * km)
 
 
-def main():
+if __name__ == "__main__":
     km = float(input("Entrez les miles de la voiture : "))
     print(f"Le prix estimé de la voiture pour un kilométrage de {km} miles est : {estimatePrice(km):.2f} euros.")
-
-
-if __name__ == "__main__":
-    main()
