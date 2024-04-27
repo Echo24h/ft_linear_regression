@@ -102,6 +102,7 @@ def main() -> None:
     axs[0].set_title('Price prediction')
     axs[0].set_xlabel('km (normalized)')
     axs[0].set_ylabel('Price (normalized)')
+    axs[0].legend(['Price = θ₀ + θ₁ * km', 'Data normalized'])
 
     # Plot the results de-normalized
     axs[1].plot(km, dataDeNormalization(t0 + (t1 * km_normalized), price), color='red', linewidth=1)
@@ -109,6 +110,7 @@ def main() -> None:
     axs[1].set_title('Price prediction')
     axs[1].set_xlabel('km')
     axs[1].set_ylabel('Price')
+    axs[1].legend(['Price = θ₀ + θ₁ * km', 'Data'])
 
     plt.tight_layout()
     plt.show()
