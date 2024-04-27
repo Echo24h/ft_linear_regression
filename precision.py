@@ -1,12 +1,11 @@
-from predict import loadParameters
+from predict import estimatePrice
 import pandas as pd
 import numpy as np
 
 
-
 def precision() -> None:
     """
-    Calculate the precision of the model
+    Calculate and print the precision of the model
 
     Args:
         None
@@ -14,18 +13,27 @@ def precision() -> None:
     Returns:
         None
     """
-    t0, t1 = loadParameters()
-    dataFrame = pd.read_csv('data.csv')
 
-    km = dataFrame['km']
-    price = dataFrame['price']
+    df = pd.read_csv('data.csv')
+    km = df['km'].values
+    price = df['price'].values
 
-    precision_min = 100 - max(abs(price - (t0 + (t1 * km))) / price * 100)
-    precision_max = 100 - min(abs(price - (t0 + (t1 * km))) / price * 100)
-    precision_moy = 100 - np.mean(abs(price - (t0 + (t1 * km))) / price * 100)
+    for i in range(len(km)):
+        price_estimated = estimatePrice(km[i])
+        price_real = price[i]
+        precision = 100 - (abs(price_estimated - price_real) / price_real * 100)
+        if i == 0:
+            precision_min = precision
+            precision_max = precision
+            precision_moy = precision
+        else:
+            if precision < precision_min:
+                precision_min = precision
+            if precision > precision_max:
+                precision_max = precision
+            precision_moy += precision
 
-    print(f"θ₀: {t0}")
-    print(f"θ₁: {t1}")
+    precision_moy /= len(km)
 
     print(f"La précision minimum du modèle est de: {precision_min:.2f}%")
     print(f"La précision moyenne du modèle est de: {precision_moy:.2f}%")
