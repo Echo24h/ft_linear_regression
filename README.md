@@ -1,6 +1,8 @@
 # ft_linear_regression
 
-<img height="300" src="https://github.com/Echo24h/Echo24h/blob/main/ft_linear_regression.png" alt="Logs console Webserv"/>
+<div style="text-align:center;">
+    <img height="400" src="https://github.com/Echo24h/Echo24h/blob/main/ft_linear_regression.png" alt="Graph Linear Regression"/>
+</div>
 
 Ce projet offre une première expérience pratique en apprentissage automatique en implémentant un algorithme de régression linéaire. Son objectif principal est de prédire le prix d'une voiture en fonction de son kilométrage. Le projet se compose de trois programmes :
 
